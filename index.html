@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo GUID | UUID</title>
+    <title>Tạo GUID | UUID | CRC16 | CRC32</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,6 +21,7 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 90%;
+            max-width: 400px;
             box-sizing: border-box;
         }
         .container input,
@@ -48,26 +49,31 @@
             margin-bottom: 5px;
         }
         @media (max-width: 600px) {
-            .container input[type="number"] {
+            .container {
                 width: 100%;
-                margin: 0;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <main class="container">
+        <label for="inputField">GUID/UUID/CRC16/CRC32:</label>
         <input type="text" id="inputField" value="" oninput="checkInput()">
-        <label for="lengthInput">Độ dài GUID:</label>
+        
+        <label for="lengthInput">Độ dài:</label>
         <input type="number" id="lengthInput" min="1" value="50">
+        
         <label for="algorithmSelect">Loại:</label>
         <select id="algorithmSelect" onchange="toggleLengthInput()">
             <option value="guid">GUID</option>
             <option value="uuid">UUID</option>      
+            <option value="crc16">CRC16</option>
+            <option value="crc32">CRC32</option>
         </select>
+        
         <button id="copyButton" onclick="copyToClipboard()" disabled>Sao chép</button>
         <button onclick="generateID()">Tạo</button>
-    </div>
+    </main>
     <script>
         function copyToClipboard() {
             const inputField = document.getElementById('inputField');
@@ -96,6 +102,46 @@
             return buf.join('');
         }
 
+        function crc16(str) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < str.length; i++) {
+                crc ^= str.charCodeAt(i);
+                for (let j = 0; j < 8; j++) {
+                    if (crc & 1) {
+                        crc = (crc >> 1) ^ 0xA001;
+                    } else {
+                        crc = crc >> 1;
+                    }
+                }
+            }
+            return crc.toString(16).toUpperCase();
+        }
+
+        function crc32(str) {
+            let crcTable = [];
+            let crc;
+            
+            for (let n = 0; n < 256; n++) {
+                crc = n;
+                for (let k = 8; k > 0; k--) {
+                    if (crc & 1) {
+                        crc = (crc >>> 1) ^ 0xEDB88320;
+                    } else {
+                        crc = crc >>> 1;
+                    }
+                }
+                crcTable[n] = crc;
+            }
+
+            crc = 0 ^ (-1);
+            
+            for (let i = 0; i < str.length; i++) {
+                crc = (crc >>> 8) ^ crcTable[(crc ^ str.charCodeAt(i)) & 0xFF];
+            }
+
+            return (crc ^ (-1)) >>> 0;
+        }
+
         function generateID() {
             const inputField = document.getElementById('inputField');
             const length = parseInt(document.getElementById('lengthInput').value, 10);
@@ -106,6 +152,10 @@
                 id = generateUUID();
             } else if (algorithm === 'guid') {
                 id = generateGUID(length);
+            } else if (algorithm === 'crc16') {
+                id = crc16(generateGUID(length));
+            } else if (algorithm === 'crc32') {
+                id = crc32(generateGUID(length));
             }
 
             inputField.value = id;
@@ -115,7 +165,7 @@
         function toggleLengthInput() {
             const lengthInput = document.getElementById('lengthInput');
             const algorithm = document.getElementById('algorithmSelect').value;
-            if (algorithm === 'uuid') {
+            if (algorithm === 'uuid' || algorithm === 'crc16' || algorithm === 'crc32') {
                 lengthInput.disabled = true;
             } else {
                 lengthInput.disabled = false;
@@ -125,11 +175,7 @@
         function checkInput() {
             const inputField = document.getElementById('inputField');
             const copyButton = document.getElementById('copyButton');
-            if (inputField.value === '') {
-                copyButton.disabled = true;
-            } else {
-                copyButton.disabled = false;
-            }
+            copyButton.disabled = inputField.value === '';
         }
 
         window.onload = toggleLengthInput;
