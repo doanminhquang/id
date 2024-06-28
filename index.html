@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UUID | GUID Generator</title>
+    <title>Tạo GUID | UUID</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -59,12 +59,12 @@
 <body>
     <div class="container">
         <input type="text" id="inputField" value="">
-        <label for="lengthInput">Độ dài (áp dụng GUID):</label>
+        <label for="lengthInput">Độ dài GUID:</label>
         <input type="number" id="lengthInput" min="1" value="50">
         <label for="algorithmSelect">Loại:</label>
         <select id="algorithmSelect" onchange="toggleLengthInput()">
-            <option value="uuid">UUID</option>
             <option value="guid">GUID</option>
+            <option value="uuid">UUID</option>      
         </select>
         <button onclick="copyToClipboard()">Sao chép</button>
         <button onclick="generateID()">Tạo</button>
@@ -122,7 +122,6 @@
             }
         }
 
-        // Initialize the state of lengthInput on page load
         window.onload = toggleLengthInput;
     </script>
 </body>
