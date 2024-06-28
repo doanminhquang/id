@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UUID Generator</title>
+    <title>UUID | GUID Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,30 +40,76 @@
         .container button:last-child {
             background-color: #28a745;
         }
+        .container select {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 220px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .container input[type="number"] {
+            width: 60px;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <input type="text" id="inputField" value="">
         <br>
-        <button onclick="copyToClipboard()">Copy</button>
-        <button onclick="generateUUID()">Generate UUID</button>
+        <label for="lengthInput">Length:</label>
+        <input type="number" id="lengthInput" min="1" value="32">
+        <br>
+        <label for="algorithmSelect">Algorithm:</label>
+        <select id="algorithmSelect">
+            <option value="uuid">UUID</option>
+            <option value="guid">GUID</option>
+        </select>
+        <br>
+        <button onclick="copyToClipboard()">Sao chép</button>
+        <button onclick="generateID()">Tạo</button>
     </div>
     <script>
         function copyToClipboard() {
             const inputField = document.getElementById('inputField');
             inputField.select();
             document.execCommand('copy');
-            alert('Copied to clipboard: ' + inputField.value);
+            alert('Sao chép vào bộ nhớ tạm: ' + inputField.value);
         }
 
         function generateUUID() {
-            const inputField = document.getElementById('inputField');
-            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 const r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
-            inputField.value = uuid;
+        }
+
+        function generateGUID(len) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const charlen = chars.length;
+            const length = len || 32;
+            const buf = [];
+            
+            for (let i = 0; i < length; i++) {
+                buf[i] = chars.charAt(Math.floor(Math.random() * charlen));
+            }
+
+            return buf.join('');
+        }
+
+        function generateID() {
+            const inputField = document.getElementById('inputField');
+            const length = parseInt(document.getElementById('lengthInput').value, 10);
+            const algorithm = document.getElementById('algorithmSelect').value;
+            let id;
+
+            if (algorithm === 'uuid') {
+                id = generateUUID();
+            } else if (algorithm === 'guid') {
+                id = generateGUID(length);
+            }
+
+            inputField.value = id;
         }
     </script>
 </body>
