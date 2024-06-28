@@ -58,7 +58,7 @@
 </head>
 <body>
     <div class="container">
-        <input type="text" id="inputField" value="">
+        <input type="text" id="inputField" value="" oninput="checkInput()">
         <label for="lengthInput">Độ dài GUID:</label>
         <input type="number" id="lengthInput" min="1" value="50">
         <label for="algorithmSelect">Loại:</label>
@@ -66,7 +66,7 @@
             <option value="guid">GUID</option>
             <option value="uuid">UUID</option>      
         </select>
-        <button onclick="copyToClipboard()">Sao chép</button>
+        <button id="copyButton" onclick="copyToClipboard()" disabled>Sao chép</button>
         <button onclick="generateID()">Tạo</button>
     </div>
     <script>
@@ -110,6 +110,7 @@
             }
 
             inputField.value = id;
+            checkInput();
         }
 
         function toggleLengthInput() {
@@ -119,6 +120,16 @@
                 lengthInput.disabled = true;
             } else {
                 lengthInput.disabled = false;
+            }
+        }
+
+        function checkInput() {
+            const inputField = document.getElementById('inputField');
+            const copyButton = document.getElementById('copyButton');
+            if (inputField.value === '') {
+                copyButton.disabled = true;
+            } else {
+                copyButton.disabled = false;
             }
         }
 
